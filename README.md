@@ -1,6 +1,6 @@
 # employeemanagement
 
-Its basic Employee Management Portal using Spring Boot MVC .
+Its a basic Employee Management Portal using Spring Boot MVC .
  which have the following features:-
 1. Employee Search and List
 2. Add new employee
