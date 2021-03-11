@@ -55,7 +55,7 @@ public class EmployeeController {
 			}
 			
 			List<Employee> employees = employeeService.getAllEmployeesOrderBy();
-			currentList = employees;
+			currentList = employeeService.getAllEmployees();
 			if(logger.isDebugEnabled()) {
 				logger.debug("Adding employee object and view to ModelAndView"); 
 			}
