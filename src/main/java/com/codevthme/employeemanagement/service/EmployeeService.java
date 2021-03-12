@@ -46,8 +46,10 @@ public class EmployeeService {
 	
 	public List<Employee> searchEmployee(String emp_id, String emp_name, String gender) {
 		
-		List<Employee> listOfEmployees = new ArrayList<Employee>();;
-		if(StringUtils.hasLength(emp_id) && StringUtils.hasText(emp_id)) {
+		List<Employee> listOfEmployees = new ArrayList<Employee>();
+		if(emp_id.isEmpty() && emp_name.isEmpty() && gender.isEmpty()) {
+			listOfEmployees = employeeRepo.getAllEmployeesOrderBy();
+		} else if(StringUtils.hasLength(emp_id) && StringUtils.hasText(emp_id)) {
 			logger.warn("Searching employee with id : "+emp_id);
 			Optional<Employee> employee = employeeRepo.findById(Integer.parseInt(emp_id.trim()));
 			
