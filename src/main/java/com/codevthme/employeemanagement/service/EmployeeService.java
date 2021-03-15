@@ -22,10 +22,7 @@ import com.codevthme.employeemanagement.model.EmployeeHistory;
 import com.codevthme.employeemanagement.repo.EmployeeHistoryRepository;
 import com.codevthme.employeemanagement.repo.EmployeeRepository;
 
-/**
- * @author 91970
- *
- */
+
 @Service
 public class EmployeeService {
 

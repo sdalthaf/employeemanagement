@@ -56,6 +56,7 @@ public class EmployeeController {
 			
 			List<Employee> employees = employeeService.getAllEmployeesOrderBy();
 			currentList = employeeService.getAllEmployees();
+			
 			if(logger.isDebugEnabled()) {
 				logger.debug("Adding employee object and view to ModelAndView"); 
 			}
@@ -127,11 +128,35 @@ public class EmployeeController {
 	
 	//show employee update form
 	@RequestMapping(value = "employee/{emp_id}", method = RequestMethod.GET)
-	public String showUpdateEmployeeForm(@PathVariable("emp_id") Integer id, Model model) {
-		logger.debug("Updating employee");
-		model.addAttribute("employee", employeeService.getEmployeeById(id));
-		UPDATE_EMPLOYEE_FLAG  = true;
-		return "update-employee";
+	public String showUpdateEmployeeForm(@PathVariable("emp_id") String id, Model model) {
+		
+		logger.warn("Fetching Employee Details..");
+		try {
+			Integer emp_id = Integer.parseInt(id);
+			Employee employee = employeeService.getEmployeeById(emp_id);
+			
+			if(employee != null) {
+				
+				logger.debug("Updating employee");
+				model.addAttribute("employee", employee);
+				UPDATE_EMPLOYEE_FLAG  = true;
+				return "update-employee";
+				
+			} else {
+				logger.warn("Sorry, No employee found with Id : "+id);
+				model.addAttribute("errorMsg", "Sorry, No employee found with Id : "+id);
+				model.addAttribute("employees", employeeService.getAllEmployeesOrderBy());
+				return "index";
+			}
+		} catch(Exception e) {
+			logger.warn("Sorry, No employee found with Id : "+id);
+			model.addAttribute("errorMsg", "Sorry, No employee found with Id : "+id);
+			model.addAttribute("employees", employeeService.getAllEmployeesOrderBy());
+			return "index";
+		}
+		
+		
+		
 	}
 	
 	@RequestMapping(value="employee/updateEmployee", method=RequestMethod.POST, params = "update")
@@ -152,26 +177,51 @@ public class EmployeeController {
 		return "redirect:/index";
 	}
 	
+	// method to handle cancel operation in edit employee screen
 	@RequestMapping(value="employee/updateEmployee", params = "cancel")
 	public String cancelUpdate() {
 		return "redirect:/index";
 	}
 	
 	
+	// method to fetch employee history based on employee id
+	// return to home page with appropriate error message if invalid id provided
+	
 	@RequestMapping(value = "employee-history/{emp_id}", method = RequestMethod.GET)
-	public ModelAndView history(@PathVariable("emp_id") Integer id) {
+	public ModelAndView history(@PathVariable("emp_id") String id) {
 		
 		logger.warn("Fetching Employee Details..");
-		Employee employee = employeeService.getEmployeeById(id);
 		ModelAndView mv = new ModelAndView();
-		logger.warn("Fetching Employee History Details..");
-		List<EmployeeHistory> employeeHistory = employeeService.getEmployeeHistory(id);
-		mv.addObject("employeeHistory", employeeHistory);
-		mv.addObject("employee", employee);
-		mv.setViewName("employment-history");
+		try {
+			Integer emp_id = Integer.parseInt(id);
+			Employee employee = employeeService.getEmployeeById(emp_id);
+			
+			if(employee != null) {
+				
+				logger.warn("Fetching Employee History Details..");
+				List<EmployeeHistory> employeeHistory = employeeService.getEmployeeHistory(Integer.parseInt(id));
+				mv.addObject("employeeHistory", employeeHistory);
+				mv.addObject("employee", employee);
+				mv.setViewName("employment-history");
+				
+			} else {
+				logger.warn("Sorry, No employee found with Id : "+id);
+				mv.addObject("errorMsg", "Sorry, No employee found with Id : "+id);
+				mv.addObject("employees", employeeService.getAllEmployeesOrderBy());
+				mv.setViewName("index");
+			}
+		} catch(Exception e) {
+			mv.addObject("errorMsg", "Sorry, No employee found with Id : "+id);
+			mv.addObject("employees", employeeService.getAllEmployeesOrderBy());
+			mv.setViewName("index");
+		}
+		
+		
 		return mv;
 	}
 	
+	// method to download all the available employees into csv form
+	// used super csv dependency
 	
 	@RequestMapping(value="/downloadCSV", method=RequestMethod.POST)
 	public String downloadCSV(HttpServletResponse response) throws IOException {
